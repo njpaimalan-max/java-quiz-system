@@ -1,0 +1,242 @@
+package quizsystem;
+
+import java.util.ArrayList;
+import java.util.Date;
+
+public class Models {
+
+    public static class User {
+        protected String username;
+        protected String password;
+        protected String role;
+
+        public User(String username, String password, String role) {
+            this.username = username;
+            this.password = password;
+            this.role = role;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public String getRole() {
+            return role;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public void setRole(String role) {
+            this.role = role;
+        }
+    }
+
+    public static class Admin extends User {
+        public Admin(String username, String password) {
+            super(username, password, "admin");
+        }
+    }
+
+    public static class Student extends User {
+        private String section;
+
+        public Student(String username, String password, String section) {
+            super(username, password, "student");
+            this.section = section;
+        }
+
+        public String getSection() {
+            return section;
+        }
+
+        public void setSection(String section) {
+            this.section = section;
+        }
+    }
+
+    public static class Question {
+        public int id;
+        public String question;
+        public String a;
+        public String b;
+        public String c;
+        public String d;
+        public String correct;
+        public String type;
+        public int points;
+
+        public Question() {
+        }
+
+        public Question(int id, String question, String a, String b,
+                        String c, String d, String correct,
+                        String type, int points) {
+            this.id = id;
+            this.question = question;
+            this.a = a;
+            this.b = b;
+            this.c = c;
+            this.d = d;
+            this.correct = correct;
+            this.type = type;
+            this.points = points;
+        }
+
+        public int getId() { return id; }
+        public void setId(int id) { this.id = id; }
+
+        public String getQuestion() { return question; }
+        public void setQuestion(String question) { this.question = question; }
+
+        public String getA() { return a; }
+        public void setA(String a) { this.a = a; }
+
+        public String getB() { return b; }
+        public void setB(String b) { this.b = b; }
+
+        public String getC() { return c; }
+        public void setC(String c) { this.c = c; }
+
+        public String getD() { return d; }
+        public void setD(String d) { this.d = d; }
+
+        public String getCorrect() { return correct; }
+        public void setCorrect(String correct) { this.correct = correct; }
+
+        public String getType() { return type; }
+        public void setType(String type) { this.type = type; }
+
+        public int getPoints() { return points; }
+        public void setPoints(int points) { this.points = points; }
+
+        public String getChoice(String letter) {
+            switch (letter.toUpperCase()) {
+                case "A": return a;
+                case "B": return b;
+                case "C": return c;
+                case "D": return d;
+                default: return "";
+            }
+        }
+
+        public boolean isCorrect(String answer) {
+            return correct.equalsIgnoreCase(answer);
+        }
+    }
+
+    public static class Score {
+        public int id;
+        public String student;
+        public String subject;
+        public int score;
+        public int total;
+        public int points;
+
+        public Score() {
+        }
+
+        public Score(String student, String subject, int score, int total, int points) {
+            this.student = student;
+            this.subject = subject;
+            this.score = score;
+            this.total = total;
+            this.points = points;
+        }
+
+        public int getId() { return id; }
+        public void setId(int id) { this.id = id; }
+
+        public String getStudent() { return student; }
+        public void setStudent(String student) { this.student = student; }
+
+        public String getSubject() { return subject; }
+        public void setSubject(String subject) { this.subject = subject; }
+
+        public int getScore() { return score; }
+        public void setScore(int score) { this.score = score; }
+
+        public int getTotal() { return total; }
+        public void setTotal(int total) { this.total = total; }
+
+        public int getPoints() { return points; }
+        public void setPoints(int points) { this.points = points; }
+
+        public double getPercentage() {
+            return total > 0 ? (score * 100.0 / total) : 0;
+        }
+
+        public String getGrade() {
+            double percentage = getPercentage();
+            if (percentage >= 90) return "A+";
+            else if (percentage >= 80) return "A";
+            else if (percentage >= 70) return "B";
+            else if (percentage >= 60) return "C";
+            else if (percentage >= 50) return "D";
+            else return "F";
+        }
+    }
+
+    public static class QuizSession {
+        public ArrayList<Question> questions;
+        public int currentQuestionIndex;
+        public int score;
+        public int totalPoints;
+        public String studentUsername;
+        public Date startTime;
+        public Date endTime;
+
+        public QuizSession() {
+            questions = new ArrayList<>();
+            currentQuestionIndex = 0;
+            score = 0;
+            totalPoints = 0;
+        }
+
+        public void addQuestion(Question question) {
+            questions.add(question);
+        }
+
+        public Question getCurrentQuestion() {
+            if (currentQuestionIndex < questions.size()) {
+                return questions.get(currentQuestionIndex);
+            }
+            return null;
+        }
+
+        public boolean hasNextQuestion() {
+            return currentQuestionIndex < questions.size() - 1;
+        }
+
+        public void nextQuestion() {
+            if (hasNextQuestion()) {
+                currentQuestionIndex++;
+            }
+        }
+
+        public boolean isComplete() {
+            return currentQuestionIndex >= questions.size();
+        }
+
+        public int getTotalQuestions() {
+            return questions.size();
+        }
+
+        public void submitAnswer(String answer) {
+            Question current = getCurrentQuestion();
+            if (current != null && current.isCorrect(answer)) {
+                score += current.getPoints();
+            }
+            totalPoints += current.getPoints();
+        }
+    }
+}
